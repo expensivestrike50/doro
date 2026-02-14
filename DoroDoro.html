@@ -1,0 +1,260 @@
+<?php 
+/** * SESSION UNBLOCKING PROTOCOL 
+ */
+session_start(); 
+session_write_close(); 
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCOUT | Forever Protocol</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;900&family=Great+Vibes&display=swap');
+
+        :root {
+            --bg-black: #050505;
+            --accent-gold: #d4af37;
+            --soft-pink: #ffb6c1;
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%; width: 100%;
+            background-color: var(--bg-black); color: #fff;
+            font-family: 'Inter', sans-serif; overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        #romance-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(255, 50, 50, 0.1) 0%, transparent 70%);
+            z-index: 1; pointer-events: none;
+        }
+
+        #proposal-ui { 
+            display: flex; align-items: center; justify-content: center; 
+            gap: 40px; z-index: 100; transition: opacity 1s; 
+            position: relative; max-width: 95%;
+        }
+        
+        .proposal-text { text-align: center; flex: 1; min-width: 400px; }
+        .romantic-label { font-family: 'Great Vibes', cursive; font-size: 35px; color: var(--soft-pink); margin-bottom: 10px; display: block; }
+        h1 { font-family: 'Arial Narrow', sans-serif; font-size: 42px; font-weight: 900; text-transform: uppercase; margin: 0 0 40px 0; letter-spacing: 2px; }
+        
+        .btn-group { display: flex; gap: 40px; justify-content: center; align-items: center; height: 100px; }
+        .btn { padding: 15px 40px; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; border: none; transition: 0.3s; }
+        .btn-yes { background: #fff; color: #000; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
+        .btn-yes:hover { transform: scale(1.1); background: var(--soft-pink); }
+
+        #no-container { 
+            position: relative; 
+            display: inline-block; 
+            z-index: 101;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #no-btn { background: transparent; border: 1px solid #333; color: #444; width: 100%; }
+
+        #video-attachment {
+            position: absolute;
+            bottom: 120%; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px; 
+            height: 150px; 
+            background: transparent; overflow: hidden;
+            display: none; border-radius: 12px;
+            mix-blend-mode: screen; 
+        }
+        .video-content { width: 100%; height: 100%; object-fit: cover; }
+
+        .side-image { 
+            width: 350px; height: auto; max-height: 450px; 
+            object-fit: contain; mix-blend-mode: screen; 
+            filter: grayscale(20%) brightness(0.8) contrast(1.1); 
+            z-index: 10; 
+        }
+
+        /* Success UI Styles */
+        #success-box {
+            position: fixed; top: 60%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px; 
+            text-align: center; border-radius: 4px; z-index: 200; display: none;
+            box-shadow: 0 0 50px rgba(255, 50, 50, 0.2); width: 80%; max-width: 500px;
+        }
+
+        /* Success Video Outside the Box */
+        #success-video-container {
+            position: fixed; top: 30%; left: 50%; transform: translate(-50%, -50%);
+            width: 150px; height: 150px; 
+            z-index: 200; display: none;
+            mix-blend-mode: screen;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .success-text { font-family: 'Arial Narrow', sans-serif; font-size: 24px; font-weight: 900; text-transform: uppercase; color: #fff; letter-spacing: 2px; line-height: 1.4; }
+
+        .cluster-text { position: absolute; font-weight: 900; text-transform: uppercase; white-space: nowrap; pointer-events: none; opacity: 0; font-size: 14px; letter-spacing: 1px; z-index: 60; }
+
+        .bg-floating { position: absolute; pointer-events: none; z-index: 5; animation: floatUp 10s linear infinite; }
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+        }
+
+        #emoji-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; }
+    </style>
+</head>
+<body>
+
+    <div id="romance-bg"></div>
+
+    <div id="proposal-ui">
+        <div class="proposal-text">
+            <span class="romantic-label">For the most special person...</span>
+            <h1>Hi Dorothy, will you be my valentine?</h1>
+            <div class="btn-group">
+                <button class="btn btn-yes" onclick="startShow()">Yes</button>
+                <div id="no-container">
+                    <div id="video-attachment">
+                        <video class="video-content" id="no-video" loop muted playsinline>
+                            <source src="dance2.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <button class="btn btn-no" id="no-btn">No</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="media-aside">
+            <img src="removed.png" alt="Valentine Image" class="side-image">
+        </div>
+    </div>
+
+    <div id="success-video-container">
+        <video class="video-content" id="success-video" loop muted playsinline>
+            <source src="danccc.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <div id="success-box">
+        <div class="success-text">I knew you would say yes! I love you so much. Happy Valentine's Day</div>
+    </div>
+
+    <div id="emoji-layer"></div>
+
+    <script>
+        const sweetTexts = ["You are my world", "My sunshine", "My heartbeat", "Queen of my heart", "Sweetest soul", "You are the best", "My everything", "Life's greatest gift", "Truly blessed", "Better together", "Love of my life"];
+        const colors = ['#ffffff', '#ff3232', '#d4af37', '#3291ff', '#00ff00', '#ff00ff'];
+        
+        const bgElements = ['🎈', '❤️', '💖', '🎈', '💕', '🌹'];
+        let bgInterval = setInterval(spawnBgElement, 400);
+
+        function spawnBgElement() {
+            const el = document.createElement('div');
+            el.className = 'bg-floating';
+            el.innerText = bgElements[Math.floor(Math.random() * bgElements.length)];
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.fontSize = Math.random() * 30 + 30 + 'px';
+            el.style.animationDuration = Math.random() * 5 + 7 + 's';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 12000);
+        }
+
+        const noContainer = document.getElementById('no-container');
+        const videoBox = document.getElementById('video-attachment');
+        const theNoVideo = document.getElementById('no-video');
+        const theSuccessVideo = document.getElementById('success-video');
+        const successVideoContainer = document.getElementById('success-video-container');
+
+        noContainer.addEventListener('mouseover', engageNoButton);
+        noContainer.addEventListener('touchstart', engageNoButton);
+
+        function engageNoButton() {
+            if (videoBox.style.display !== 'block') {
+                videoBox.style.display = 'block';
+                theNoVideo.play();
+            }
+            const x = Math.random() * (window.innerWidth - 300);
+            const y = Math.random() * (window.innerHeight - 500) + 300; 
+            noContainer.style.position = 'fixed'; 
+            noContainer.style.left = x + 'px';
+            noContainer.style.top = y + 'px';
+        }
+
+        function startShow() {
+            clearInterval(bgInterval);
+            document.querySelectorAll('.bg-floating').forEach(el => el.remove());
+            document.getElementById('proposal-ui').style.opacity = '0';
+            document.getElementById('romance-bg').style.opacity = '0';
+            
+            setTimeout(() => {
+                document.getElementById('proposal-ui').remove();
+                document.getElementById('success-box').style.display = 'block';
+                successVideoContainer.style.display = 'block';
+                theSuccessVideo.play();
+            }, 1000);
+
+            setInterval(launchFireworks, 2000);
+            setInterval(spawnEmoji, 300);
+            sweetTexts.forEach((txt, i) => {
+                setTimeout(() => createClusterItem(txt), i * 800);
+            });
+        }
+
+        function createClusterItem(text) {
+            const el = document.createElement('div');
+            el.className = 'cluster-text';
+            el.innerText = text;
+            el.style.color = colors[Math.floor(Math.random() * colors.length)];
+            document.body.appendChild(el);
+            let posX = Math.random() * window.innerWidth;
+            let posY = Math.random() * window.innerHeight;
+            let velX = (Math.random() - 0.5) * 2.5; 
+            let velY = (Math.random() - 0.5) * 2.5;
+            function move() {
+                posX += velX; posY += velY;
+                if (posX < 0 || posX > window.innerWidth - 150) velX *= -1;
+                if (posY < 0 || posY > window.innerHeight - 20) velY *= -1;
+                el.style.left = posX + 'px'; el.style.top = posY + 'px'; el.style.opacity = '0.7';
+                requestAnimationFrame(move);
+            }
+            move();
+        }
+
+        function spawnEmoji() {
+            const layer = document.getElementById('emoji-layer');
+            const emoji = document.createElement('div');
+            emoji.innerText = Math.random() > 0.5 ? '❤️' : '💖';
+            emoji.style.position = 'absolute';
+            emoji.style.left = Math.random() * 100 + 'vw';
+            emoji.style.top = '110vh';
+            emoji.style.fontSize = Math.random() * 20 + 20 + 'px';
+            emoji.style.transition = 'transform 5s linear, opacity 5s';
+            layer.appendChild(emoji);
+            setTimeout(() => {
+                emoji.style.transform = `translateY(-120vh) rotate(${Math.random() * 360}deg)`;
+                emoji.style.opacity = '0';
+            }, 100);
+            setTimeout(() => emoji.remove(), 5000);
+        }
+
+        function launchFireworks() {
+            const end = Date.now() + (2 * 1000);
+            const colors = ['#ff3232', '#ffffff', '#ffb6c1'];
+            (function frame() {
+                confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+                confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+    </script>
+</body>
+</html>
